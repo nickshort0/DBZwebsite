@@ -1,0 +1,58 @@
+﻿@using System.Data.SqlClient;
+@using System.Configuration;
+
+@{
+    Layout = "~/Shared/_Layout.cshtml";
+    var message = "";
+    Validation.RequireField("txtName", "name is required");
+    Validation.RequireField("txtPassword", "password is required");
+
+    if (IsPost)
+    {
+        if (Validation.IsValid())
+        {
+            var txtName = Request["txtName"];
+            var txtPassword = Request["txtPassword"];
+            Response.Cookies["username"].Value = txtName;
+            Response.Cookies["password"].Value = txtPassword;
+            <p>@message</p>
+
+            string conStr = ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString;
+            using (SqlConnection con = new SqlConnection(conStr))
+            {
+                con.Open();
+
+                //Create the SQL Query for inserting a product
+                string sqlQuery = String.Format("INSERT into Users(Username, Password) Values('{0}', '{1}');", txtName, txtPassword);
+
+                //Create a Command object
+                using (SqlCommand command = new SqlCommand(sqlQuery, con))
+                {
+                    command.ExecuteNonQuery();
+                }
+            }
+
+            var url = string.Format("~/index.cshtml");
+            Response.Redirect(url);
+        }
+    }
+}
+<!DOCTYPE html>
+<html>
+<body>
+    <form method="post">
+        @Html.ValidationSummary()
+        <p>
+            <b style="color:white">Username:</b> <br />
+            <input type="text" name="txtName" value="" size="20" maxlength="20" />
+</p>
+        
+        <p>
+            <b style="color:white">Password:</b><br />
+            <input type="password" name="txtPassword" size="12" maxlength="32" />
+        </p>
+        <input type="submit" value="Submit" />
+    </form>
+
+</body>
+</html>

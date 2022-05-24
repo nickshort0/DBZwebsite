@@ -1,0 +1,114 @@
+﻿@using System.Data.SqlClient;
+@using System.Data;
+@using System.Configuration;
+
+@{
+    Layout = "~/Shared/_Layout.cshtml";
+
+    if (IsPost)
+    {
+        if (Validation.IsValid())
+        {
+            var fid = int.Parse(Request["fighter"]);           
+            var name = GetNameDS(fid).Tables[0].Rows[0]["FighterName"];
+            var opponent = Request["opponent"];
+            var result = Request["result"];
+            var won = Request["won"];
+
+
+
+            string conStr = ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString;
+            using (SqlConnection con = new SqlConnection(conStr))
+            {
+                con.Open();
+
+                //Create the SQL Query for inserting a product
+                string sqlQuery = String.Format("INSERT into Fights(FighterID, FighterName, Opponent, Result, Won) Values('{0}', '{1}', '{2}', '{3}', '{4}');", fid, name, opponent, result, won);
+
+                //Create a Command object
+                using (SqlCommand command = new SqlCommand(sqlQuery, con))
+                {
+                    command.ExecuteNonQuery();
+                }
+            }
+            DataSet ds = GetDSFromDB();
+            var url = string.Format("~/index.cshtml");
+            Response.Redirect(url);
+
+        }
+    }
+}
+@functions
+{
+
+    private DataSet GetDSFromDB()
+    {
+
+        DataSet dsFights = new DataSet();
+
+        using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ToString()))
+        {
+            string query = "SELECT FighterID, FighterName FROM Fighters";
+            SqlDataAdapter da = new SqlDataAdapter(query, con);
+            con.Open();
+            da.Fill(dsFights, "Fights");
+
+        }
+
+        return dsFights;
+    }
+    private DataSet GetNameDS(int fid)
+    {
+
+        DataSet dsFights = new DataSet();
+
+        using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ToString()))
+        {
+            string query = "SELECT FighterName FROM Fighters WHERE FighterID=" + fid;
+            SqlDataAdapter da = new SqlDataAdapter(query, con);
+            con.Open();
+            da.Fill(dsFights, "Fights");
+
+        }
+
+        return dsFights;
+    }
+
+}
+<!DOCTYPE html>
+<html>
+<body>
+    <form method="post">
+        @Html.ValidationSummary()
+        <p>
+            <b style="color:white">Fighter:</b> <br />
+            <select name="fighter">
+                @for (int i = 1; i < GetDSFromDB().Tables[0].Rows.Count; i++)
+                {
+                    <option value=@GetDSFromDB().Tables[0].Rows[i]["FighterID"]>@GetDSFromDB().Tables[0].Rows[i]["FighterName"].ToString()</option>
+                }
+                
+            </select>
+        </p>
+        <p>
+         <b style="color:white">Opponent Name:</b> <br />
+        <input type="text" name="opponent" value="" size="20" maxlength="20" />
+        </p>
+        <p>
+            <b style="color:white">Result:</b> <br />
+            <select name="won">
+            <option value="1">Won</option>
+            <option value="0">Lost</option>
+            <option value="0">Other</option>      
+        </select>
+        </p>
+        <p>
+            <b style="color:white">Description of fight: </b> <br />
+            <input type="text" name="result" value="" size="50" maxlength="50" />
+        </p>
+        <p>
+            <input type="submit" value="Submit" />
+</form>
+
+</body>
+</html>

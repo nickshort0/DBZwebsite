@@ -1,0 +1,50 @@
+﻿@using System.Data.SqlClient;
+@using System.Data;
+@using System.Configuration;
+
+@{
+    Layout = "~/Shared/_Layout.cshtml";
+    
+    if (IsPost)
+    {
+        if (Validation.IsValid())
+        {
+            var name = Request["name"][0].ToString().ToUpper() + Request["name"].Substring(1);
+           
+
+            string conStr = ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString;
+            using (SqlConnection con = new SqlConnection(conStr))
+            {
+                con.Open();
+
+                //Create the SQL Query for inserting a product
+                string sqlQuery = String.Format("INSERT into Fighters(FighterName) Values('{0}');", name);
+
+                //Create a Command object
+                using (SqlCommand command = new SqlCommand(sqlQuery, con))
+                {
+                    command.ExecuteNonQuery();
+                }
+            }
+            var url = string.Format("~/index.cshtml");
+            Response.Redirect(url);
+            
+        }
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<body>
+    <form method="post">
+        @Html.ValidationSummary()
+         <b style="color:white">Fighter Name:</b> <br />
+        <p>
+        <input type="text" name="name" value="" size="20" maxlength="20" />
+        </p>      
+            <input type="submit" value="Submit" />
+        
+</form>
+
+</body>
+</html>

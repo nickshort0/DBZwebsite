@@ -1,0 +1,39 @@
+﻿@{
+    string uname ="";
+    string pword ="";
+    if (Request.Cookies["username"] != null && Request.Cookies["password"] != null)
+    {
+        uname = Request.Cookies["username"].Value;
+        pword = Request.Cookies["password"].Value;
+    }
+
+}
+<header>
+    <h1 style="-webkit-text-stroke: 1px black;">Dragon Ball Data Base</h1>
+    <nav>
+        <ul>
+            <li><a href="~/index.cshtml">Home</a></li>
+            @{
+
+                if (uname != string.Empty && pword != string.Empty)
+                {
+                    @:
+                    <li>Welcome @uname</li>
+                    <li><a href="~/logout.cshtml">Logout</a></li>
+
+                }
+                else
+                {
+                    @:
+                    <li><a href="~/login.cshtml">Login</a></li>
+
+                }
+            }
+            
+            <li><a href="~/payment.cshtml">Payment</a></li>
+            <li><a href="~/fighterselect.cshtml">Fight Predictor</a></li>
+            <li><a href="~/addfight.cshtml">Add a Fight</a></li>
+            <li><a href="~/addfighter.cshtml">Add a Fighter</a></li>
+        </ul>           
+    </nav>
+</header>

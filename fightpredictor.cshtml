@@ -1,0 +1,160 @@
+﻿@using System.Data.SqlClient;
+@using System.Data;
+@using System.Configuration;
+@{
+//if(Session["paid"] == null)
+//{
+//    Response.Redirect(string.Format("~/payment.cshtml"));
+//}
+}
+
+
+@helper ShowFighterList()
+{
+
+
+var fighter = Request.QueryString["fighter"];
+var opponent = Request.QueryString["opponent"];
+var fightername = "";
+var oppname = "";
+var wins1 = 0;
+var wins2 = 0;
+
+string str = "";
+    <div>
+        @{
+            //fighters
+            fightername = fighter[0].ToString().ToUpper() + fighter.Substring(1);
+            switch (fighter)
+            {
+                case "18":
+                    fightername = "Android 18";
+                    break;
+                case "buu":
+                    fightername = "Majin Buu";
+                    break;
+                case "satan":
+                    fightername = "Mr. Satan";
+                    break;
+                default: break;
+            }
+            // opponents
+           oppname = opponent[0].ToString().ToUpper() + opponent.Substring(1);
+            switch (opponent)
+            {
+                case "18":
+                    oppname = "Android 18";
+                    break;
+                case "buu":
+                    oppname = "Majin Buu";
+                    break;
+                case "satan":
+                    oppname = "Mr. Satan";
+                    break;
+                default: break;
+            }
+           
+            DataSet ds = GetDSFromDB(fightername, oppname);
+            for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+            {
+                if (ds.Tables[0].Rows[i]["FighterName"].ToString() == fightername)
+                {
+                    wins1 = (int)ds.Tables[0].Rows[i]["Wins"];
+                }
+            }
+            for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+            {
+                if (ds.Tables[0].Rows[i]["FighterName"].ToString() == oppname)
+                {
+                    wins2 = (int)ds.Tables[0].Rows[i]["Wins"];
+                }
+            }
+
+            if (wins1 > wins2)
+            {
+                if ((wins1 - wins2) < 3)
+                {
+                    str = fightername + " would beat " + oppname + " in a close fight";
+                }
+                else if ((wins1 - wins2) > 5)
+                {
+                    str = fightername + " would destroy " + oppname;
+                }
+                else
+                {
+                    str = fightername + " would beat " + oppname;
+                }
+
+
+            }
+            else if (wins2 > wins1)
+            {
+                str = oppname + " would beat " + fightername;
+                if ((wins2 - wins1) < 2)
+                {
+                    str = oppname + " would beat " + fightername + " in a close fight";
+                }
+                else if ((wins2 - wins1) > 5)
+                {
+                    str = oppname + " would destroy " + fightername;
+                }
+                else
+                {
+                    str = oppname + " would beat " + fightername;
+                }
+            }
+            else
+            {
+                str = fightername + " and " + oppname + " are evenly matched";
+            }
+        }
+
+
+        <h1 style="color:white">@str</h1>
+
+
+    </div>
+}
+@functions
+{
+    private DataSet GetDSFromDB(string fighterName, string oppName)
+    {
+
+        DataSet dsFights = new DataSet();
+
+        using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ToString()))
+        {
+
+            string query = "SELECT Sum(Won) AS Wins, FighterName FROM Fights WHERE fighterName='"
+                + fighterName + "' OR fighterName='" + oppName + "'GROUP BY FighterName";
+
+
+            SqlDataAdapter da = new SqlDataAdapter(query, con);
+
+
+            con.Open();
+
+
+            da.Fill(dsFights, "Fights");
+
+        }
+
+        return dsFights;
+    }
+
+
+
+}
+
+
+@{
+    Layout = "~/Shared/_Layout.cshtml"; 
+}
+<!DOCTYPE html>
+<html>
+<body>
+    <br /><br />
+
+    @ShowFighterList()
+</body>
+</html>

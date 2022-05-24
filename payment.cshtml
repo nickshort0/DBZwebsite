@@ -1,0 +1,51 @@
+﻿@{
+    Layout = "~/Shared/_Layout.cshtml";
+    var message = "";
+    Validation.RequireField("txtFirst", "first name is required");
+    Validation.RequireField("txtLast", "Last name is required");
+    Validation.RequireField("txtCredit", "Credit Card Number is required");
+    Validation.RequireField("txtCVV", "Security Code is required");
+    Validation.Add("txtCredit", Validator.Integer("credit card must be an integer"));
+    Validation.Add("txtCVV", Validator.Integer("security code must be an integer"));
+    if (IsPost)
+    {
+        if (Validation.IsValid())
+        {
+            var txtFirst = Request["txtFirst"];
+            var txtLast = Request["txtLast"];
+            var txtCredit = Request["txtCredit"];
+            var txtCVV = Request["txtCVV"];
+            <p>@message</p>
+            Session["paid"] = true;
+            var url = string.Format("~/index.cshtml");
+            Response.Redirect(url);
+        }
+    }
+}<!DOCTYPE html>
+<html>
+<body>
+    <form method="post">
+        @Html.ValidationSummary()
+        <p>
+            <b style="color:white">First Name:</b><br />
+                <input type="text" name="txtFirst" value="" size="20" maxlength="20" />
+</p>
+        <p>
+            <b style="color:white">Last Name:</b><br />
+                <input type="text" name="txtLast" value="" size="20" maxlength="20" />
+</p>
+        <p>
+            <b style="color:white">Credit Card Number:</b><br />
+                <input type="text" name="txtCredit" value="" size="20" maxlength="20" />
+</p>
+        <p>
+            <b style="color:white">Security Code:</b><br />
+                <input type="text" name="txtCVV" value="" size="3" maxlength="3" />
+</p>
+        
+
+        <input type="submit" value="Submit" />
+    </form>
+
+</body>
+</html>

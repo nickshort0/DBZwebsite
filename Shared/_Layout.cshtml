@@ -1,0 +1,21 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Cha la head cha la</title>
+    <link rel="stylesheet" href="~/StyleSheet.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+    @RenderPage("~/Shared/_Header.cshtml")
+    <div id="main">
+        @RenderBody()
+    </div>
+    <div id="footer">
+        &copy; 2018 Toei Animation. All rights reserved.
+    </div>
+</body>
+</html>

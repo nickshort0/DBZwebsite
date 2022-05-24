@@ -1,0 +1,87 @@
+﻿@using System.Data.SqlClient;
+@using System.Data;
+@using System.Configuration;
+@*@{
+        if(Session["paid"] == null)
+        {
+            Response.Redirect(string.Format("~/payment.cshtml"));
+        }
+    }*@
+
+
+@helper ShowFighterList(DataSet ds)
+{
+    <div>
+        <h2>
+            <ul style="-webkit-text-stroke: 1px black; font-weight:bold">
+                @for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    string str = ds.Tables[0].Rows[i]["FighterName"].ToString() + " vs. " + ds.Tables[0].Rows[i]["Opponent"].ToString() + " : " + ds.Tables[0].Rows[i]["Result"].ToString();
+                    <li style="color:white">@str</li>
+                }
+
+            </ul>
+        </h2>
+    </div>
+}
+@functions
+{
+    private DataSet GetDSFromDB(string fighterName)
+    {
+
+        DataSet dsFights = new DataSet();
+
+        using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ToString()))
+        {
+
+            string query = "SELECT * FROM Fights WHERE FighterName='" + fighterName + "'";
+
+
+            SqlDataAdapter da = new SqlDataAdapter(query, con);
+
+
+            con.Open();
+
+
+            da.Fill(dsFights, "Fights");
+
+        }
+
+        return dsFights;
+    }
+}
+
+
+
+@{
+        Layout = "~/Shared/_Layout.cshtml";
+        var fighter = Request.QueryString["fighter"];
+        var name = fighter[0].ToString().ToUpper() + fighter.Substring(1);
+        switch (fighter)
+        {
+            case "18":
+                name = "Android 18";
+                break;
+            case "buu":
+                name = "Majin Buu";
+                break;
+            case "satan":
+                name = "Mr. Satan";
+                break;
+            default: break;
+        }
+        DataSet sdtDS = GetDSFromDB(name);
+
+
+    }
+            
+
+        
+<!DOCTYPE html>
+<html>
+<body>
+    <br /><br />
+
+    @ShowFighterList(sdtDS)
+</body>
+</html>
